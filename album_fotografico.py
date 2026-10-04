@@ -1,21 +1,62 @@
 def carica_da_file(file_path):
     """Carica le foto dal file, creando un nuovo anno ogni volta che compare per la prima volta"""
-    # TODO
+    album = {}
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            next(file)
+            for riga in file:
+                r = riga.rstrip('\n').split(',')
+                codice = r[0]
+                anno = int(r[4])
+                titolo = r[1]
+                autore = r[2]
+                mese = int(r[3])
+                foto = [codice, titolo, autore, mese, anno]
+                if anno not in album:
+                    album[anno] = []
+                album[anno].append(foto)
+    except FileNotFoundError:
+        return None
+    return album
 
 
 def aggiungi_foto(album, codice, titolo, autore, mese, anno, file_path):
     """Aggiunge una foto all'album, creando l'anno al volo se non è ancora presente"""
-    # TODO
+    for a in album:
+        for foto in album[a]:
+            if codice == foto[0]:
+                return None
+    if mese < 1 or mese > 12:
+        return None
+    if anno not in album:
+        album[anno] = []
+    foto = [codice, titolo, autore, mese, anno]
 
+    album[anno].append(foto)
 
+    with open(file_path, 'a', encoding='utf-8') as file:
+        file.write(f"{codice},{titolo},{autore},{mese},{anno}\n")
+
+    return foto
 def cerca_foto(album, codice):
     """Cerca una foto nell'album dato il codice"""
-    # TODO
+    for a in album:
+        for foto in album[a]:
+            if codice == foto[0]:
+                return f"{foto[0]}, {foto[1]}, {foto[2]}, {foto[3]}, {foto[4]}"
+    return None
 
 
 def elenco_foto_anno_per_titolo(album, anno):
     """Ordina i titoli delle foto di un dato anno in ordine alfabetico"""
-    # TODO
+    if anno not in album:
+        return None
+
+    titoli = []
+    for foto in album[anno]:
+        titoli.append(foto[1])
+    titoli.sort()
+    return titoli
 
 
 def main():
@@ -36,6 +77,7 @@ def main():
             while True:
                 file_path = input("Inserisci il path del file da caricare: ").strip()
                 album = carica_da_file(file_path)
+
                 if album is not None:
                     break
 
